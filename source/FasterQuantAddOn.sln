@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterQuant.SimulatedBroker", "FasterQuant.SimulatedBroker\FasterQuant.SimulatedBroker.csproj", "{180DE845-4BB4-44D6-A00B-F4AEF0A90615}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterQuant.StrategyExtension", "FasterQuant.StrategyExtension\FasterQuant.StrategyExtension.csproj", "{677B6ECD-B6CE-4849-82C8-7BABCADE1F2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterQuant.PositionTracker", "FasterQuant.PositionTracker\FasterQuant.PositionTracker.csproj", "{E6FC9F93-579B-42FB-A40C-6D0A6C3424EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasterQuant.PositionTrackerTests", "FasterQuant.PositionTrackerTests\FasterQuant.PositionTrackerTests.csproj", "{9C9E1B86-2882-4552-9D9F-92369C7FB609}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{180DE845-4BB4-44D6-A00B-F4AEF0A90615}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{180DE845-4BB4-44D6-A00B-F4AEF0A90615}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{180DE845-4BB4-44D6-A00B-F4AEF0A90615}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{180DE845-4BB4-44D6-A00B-F4AEF0A90615}.Release|Any CPU.Build.0 = Release|Any CPU
+		{677B6ECD-B6CE-4849-82C8-7BABCADE1F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{677B6ECD-B6CE-4849-82C8-7BABCADE1F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{677B6ECD-B6CE-4849-82C8-7BABCADE1F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{677B6ECD-B6CE-4849-82C8-7BABCADE1F2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6FC9F93-579B-42FB-A40C-6D0A6C3424EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6FC9F93-579B-42FB-A40C-6D0A6C3424EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6FC9F93-579B-42FB-A40C-6D0A6C3424EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6FC9F93-579B-42FB-A40C-6D0A6C3424EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C9E1B86-2882-4552-9D9F-92369C7FB609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C9E1B86-2882-4552-9D9F-92369C7FB609}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C9E1B86-2882-4552-9D9F-92369C7FB609}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C9E1B86-2882-4552-9D9F-92369C7FB609}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4AADFDD-184C-4E58-A537-30C6D563D37B}
+	EndGlobalSection
+EndGlobal
