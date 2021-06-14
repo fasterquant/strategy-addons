@@ -21,6 +21,14 @@ namespace FasterQuant.PositionTracker
                                                     : positionTrackerManager.PositionInfos.Where(pi => pi.PortfolioId != portfolioId).ToList();
         }
 
+        public static void Initialize(int maxPositionCount, int maxPositionCountPerSymbol)
+        {
+            var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
+            positionTrackerManager.PositionInfos = new List<PositionInfo>();
+            positionTrackerManager.MaxPositionCount = maxPositionCount;
+            positionTrackerManager.MaxPositionCountPerSymbol = maxPositionCountPerSymbol;
+        }
+
         public static void AddPositionInfo(int positionId, double averageEntryPrice, double currentPrice, DateTime entryDateTime, int portfolioId, double quantity, int strategyId,
             string symbol, PositionType type)
         {
@@ -89,6 +97,47 @@ namespace FasterQuant.PositionTracker
             positionInfo.ProfitLoss = profitLoss;
             positionInfo.Quantity = quantity;
             positionInfo.Status = status;
+        }
+
+        public static void UpsertPositionInfo(int positionId, int strategyId, string symbol, PositionType type, PositionStatus status)
+        {
+            var hExt = GetPositionInfoTrackerManagerInstance();
+            var positionInfo = hExt.PositionInfos.FirstOrDefault(pi =>
+                pi.StrategyId == strategyId && pi.Symbol == symbol && pi.Type == type && pi.Status == status);
+
+            if (positionInfo != null)
+            {
+                positionInfo.PositionId = positionId;
+                positionInfo.Status = status;
+
+                return;
+            }
+
+            hExt.PositionInfos.Add(new PositionInfo(positionId, strategyId, symbol, type, status));
+        }
+
+        public static void UpdatePositionInfo(int positionId, int strategyId, PositionStatus status)
+        {
+            var hExt = GetPositionInfoTrackerManagerInstance();
+            var positionInfo = hExt.PositionInfos.FirstOrDefault(pi =>
+                pi.StrategyId == strategyId && pi.PositionId == positionId);
+
+            if (positionInfo != null)
+            {
+                positionInfo.Status = status;
+            }
+        }
+
+        public static int GetMaxPositionCount()
+        {
+            var hExt = GetPositionInfoTrackerManagerInstance();
+            return hExt.MaxPositionCount;
+        }
+
+        public static int GetMaxPositionCountPerSymbol()
+        {
+            var hExt = GetPositionInfoTrackerManagerInstance();
+            return hExt.MaxPositionCountPerSymbol;
         }
 
         public static double GetSymbolQuantityInOpenLosingPositions(string symbol)
