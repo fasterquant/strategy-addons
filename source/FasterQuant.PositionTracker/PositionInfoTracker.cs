@@ -108,7 +108,6 @@ namespace FasterQuant.PositionTracker
             if (positionInfo != null)
             {
                 positionInfo.PositionId = positionId;
-                positionInfo.Status = status;
 
                 return;
             }
@@ -116,16 +115,9 @@ namespace FasterQuant.PositionTracker
             hExt.PositionInfos.Add(new PositionInfo(positionId, strategyId, symbol, type, status));
         }
 
-        public static void UpdatePositionInfo(int positionId, int strategyId, PositionStatus status)
+        public static void SetPositionInfoToClosed(PositionInfo positionInfo)
         {
-            var hExt = GetPositionInfoTrackerManagerInstance();
-            var positionInfo = hExt.PositionInfos.FirstOrDefault(pi =>
-                pi.StrategyId == strategyId && pi.PositionId == positionId);
-
-            if (positionInfo != null)
-            {
-                positionInfo.Status = status;
-            }
+            positionInfo.Status = PositionStatus.Closed;
         }
 
         public static int GetMaxPositionCount()
