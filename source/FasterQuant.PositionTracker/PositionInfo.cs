@@ -4,7 +4,7 @@ namespace FasterQuant.PositionTracker
 {
     public class PositionInfo
     {
-        public int PositionId { get; }
+        public int PositionId { get; internal set; }
         public double AverageEntryPrice { get; internal set; }
         public long PortfolioDateTime { get; }
         public double CurrentPrice { get; internal set; }
@@ -83,5 +83,13 @@ namespace FasterQuant.PositionTracker
             PortfolioDateTime = barStartDateTime;
         }
 
+        public PositionInfo(int positionId, int strategyId, string symbol, PositionType type, PositionStatus status)
+        {
+            PositionId = positionId;
+            StrategyId = strategyId;
+            Symbol = symbol;
+            Type = type;
+            Status = status;
+        }
     }
 }
