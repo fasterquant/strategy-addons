@@ -6,8 +6,8 @@ namespace FasterQuant.PositionTracker
     {
 
         internal List<PositionInfo> PositionInfos;
-        internal int MaxPositionCount;
-        internal int MaxPositionCountPerSymbol;
+        internal Dictionary <int, int> MaxPositionCount;
+        internal Dictionary<int, int> MaxPositionCountPerSymbol;
 
         private static readonly PositionInfoTrackerManager instance = new PositionInfoTrackerManager();
 

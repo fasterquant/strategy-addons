@@ -11,6 +11,8 @@ namespace FasterQuant.PositionTracker
         {
             var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
             positionTrackerManager.PositionInfos = new List<PositionInfo>();
+            positionTrackerManager.MaxPositionCount = new Dictionary<int, int>();
+            positionTrackerManager.MaxPositionCountPerSymbol = new Dictionary<int, int>();
         }
 
         public static void Initialize(int portfolioId)
@@ -19,14 +21,18 @@ namespace FasterQuant.PositionTracker
             positionTrackerManager.PositionInfos = positionTrackerManager.PositionInfos == null
                                                     ? new List<PositionInfo>()
                                                     : positionTrackerManager.PositionInfos.Where(pi => pi.PortfolioId != portfolioId).ToList();
+            positionTrackerManager.MaxPositionCount = new Dictionary<int, int>();
+            positionTrackerManager.MaxPositionCountPerSymbol = new Dictionary<int, int>();
         }
 
-        public static void Initialize(int maxPositionCount, int maxPositionCountPerSymbol)
+        public static void Initialize(int portfolioId, int maxPositionCount, int maxPositionCountPerSymbol)
         {
             var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
             positionTrackerManager.PositionInfos = new List<PositionInfo>();
-            positionTrackerManager.MaxPositionCount = maxPositionCount;
-            positionTrackerManager.MaxPositionCountPerSymbol = maxPositionCountPerSymbol;
+            positionTrackerManager.MaxPositionCount = new Dictionary<int, int>();
+            positionTrackerManager.MaxPositionCountPerSymbol = new Dictionary<int, int>();
+            positionTrackerManager.MaxPositionCount[portfolioId] = maxPositionCount;
+            positionTrackerManager.MaxPositionCountPerSymbol[portfolioId] = maxPositionCountPerSymbol;
         }
 
         public static void AddPositionInfo(int positionId, double averageEntryPrice, double currentPrice, DateTime entryDateTime, int portfolioId, double quantity, int strategyId,
@@ -99,11 +105,11 @@ namespace FasterQuant.PositionTracker
             positionInfo.Status = status;
         }
 
-        public static void UpsertPositionInfo(int positionId, int strategyId, string symbol, PositionType type, PositionStatus status)
+        public static void UpsertPositionInfo(int positionId, int portfolioId, int strategyId, string symbol, PositionType type, PositionStatus status)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
             var positionInfo = hExt.PositionInfos.FirstOrDefault(pi =>
-                pi.StrategyId == strategyId && pi.Symbol == symbol && pi.Type == type && pi.Status == status);
+                pi.StrategyId == strategyId && pi.PortfolioId == portfolioId && pi.Symbol == symbol && pi.Type == type && pi.Status == status);
 
             if (positionInfo != null)
             {
@@ -120,16 +126,16 @@ namespace FasterQuant.PositionTracker
             positionInfo.Status = PositionStatus.Closed;
         }
 
-        public static int GetMaxPositionCount()
+        public static int GetMaxPositionCount(int portfolioId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.MaxPositionCount;
+            return hExt.MaxPositionCount.ContainsKey(portfolioId) ? hExt.MaxPositionCount[portfolioId] : 0;
         }
 
-        public static int GetMaxPositionCountPerSymbol()
+        public static int GetMaxPositionCountPerSymbol(int portfolioId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.MaxPositionCountPerSymbol;
+            return hExt.MaxPositionCountPerSymbol.ContainsKey(portfolioId) ? hExt.MaxPositionCountPerSymbol[portfolioId] : 0;
         }
 
         public static double GetSymbolQuantityInOpenLosingPositions(string symbol)
@@ -153,6 +159,18 @@ namespace FasterQuant.PositionTracker
             var hExt = GetPositionInfoTrackerManagerInstance();
             return hExt.PositionInfos.Where(pi => pi.Status == PositionStatus.Open).ToList();
 
+        }
+
+        public static List<PositionInfo> GetOpenPositionInfos(int portfolioId, int strategyId)
+        {
+            var hExt = GetPositionInfoTrackerManagerInstance();
+            return hExt.PositionInfos.Where(pi => pi.Status == PositionStatus.Open && pi.PortfolioId == portfolioId && pi.StrategyId == strategyId).ToList();
+        }
+
+        public static List<PositionInfo> GetOpenPositionInfos(int portfolioId)
+        {
+            var hExt = GetPositionInfoTrackerManagerInstance();
+            return hExt.PositionInfos.Where(pi => pi.Status == PositionStatus.Open && pi.PortfolioId == portfolioId).ToList();
         }
 
         public static List<PositionInfo> GetPositionInfos()
