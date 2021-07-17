@@ -83,9 +83,10 @@ namespace FasterQuant.PositionTracker
             PortfolioDateTime = barStartDateTime;
         }
 
-        public PositionInfo(int positionId, int strategyId, string symbol, PositionType type, PositionStatus status)
+        public PositionInfo(int positionId, int portfolioId, int strategyId, string symbol, PositionType type, PositionStatus status)
         {
             PositionId = positionId;
+            PortfolioId = portfolioId;
             StrategyId = strategyId;
             Symbol = symbol;
             Type = type;

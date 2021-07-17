@@ -118,7 +118,7 @@ namespace FasterQuant.PositionTracker
                 return;
             }
 
-            hExt.PositionInfos.Add(new PositionInfo(positionId, strategyId, symbol, type, status));
+            hExt.PositionInfos.Add(new PositionInfo(positionId, portfolioId, strategyId, symbol, type, status));
         }
 
         public static void SetPositionInfoToClosed(PositionInfo positionInfo)
