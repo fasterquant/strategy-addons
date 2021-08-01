@@ -67,8 +67,16 @@ namespace FasterQuant.PositionTracker
             PositionStatus status, int strategyId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            var positionInfo = hExt.PositionInfos.FirstOrDefault(pi =>
-                pi.PositionId == positionId && pi.StrategyId == strategyId && pi.PortfolioId == portfolioId);
+            
+            PositionInfo positionInfo = null;
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].PositionId == positionId && hExt.PositionInfos[x].StrategyId == strategyId && hExt.PositionInfos[x].PortfolioId == portfolioId)
+                {
+                    positionInfo = hExt.PositionInfos[x];
+                    break;
+                }
+            }
 
             if (positionInfo == null)
             {
@@ -88,8 +96,16 @@ namespace FasterQuant.PositionTracker
             PositionStatus status, int strategyId, long portfolioDateTime)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            var positionInfo = hExt.PositionInfos.FirstOrDefault(pi =>
-                pi.PositionId == positionId && pi.StrategyId == strategyId && pi.PortfolioId == portfolioId && pi.PortfolioDateTime == portfolioDateTime);
+           
+            PositionInfo positionInfo = null;
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].PositionId == positionId && hExt.PositionInfos[x].StrategyId == strategyId && hExt.PositionInfos[x].PortfolioId == portfolioId && hExt.PositionInfos[x].PortfolioDateTime == portfolioDateTime)
+                {
+                    positionInfo = hExt.PositionInfos[x];
+                    break;
+                }
+            }
 
             if (positionInfo == null)
             {
@@ -108,8 +124,16 @@ namespace FasterQuant.PositionTracker
         public static void UpsertPositionInfo(int positionId, int portfolioId, int strategyId, string symbol, PositionType type, PositionStatus status)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            var positionInfo = hExt.PositionInfos.FirstOrDefault(pi =>
-                pi.StrategyId == strategyId && pi.PortfolioId == portfolioId && pi.Symbol == symbol && pi.Type == type && pi.Status == status);
+          
+            PositionInfo positionInfo = null;
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].StrategyId == strategyId && hExt.PositionInfos[x].PortfolioId == portfolioId && hExt.PositionInfos[x].Symbol == symbol && hExt.PositionInfos[x].Type == type && hExt.PositionInfos[x].Status == status)
+                {
+                    positionInfo = hExt.PositionInfos[x];
+                    break;
+                }
+            }
 
             if (positionInfo != null)
             {
@@ -141,57 +165,120 @@ namespace FasterQuant.PositionTracker
         public static double GetSymbolQuantityInOpenLosingPositions(string symbol)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.PositionInfos.Where(pi => pi.Symbol == symbol && pi.PriceChange < 0 && pi.Status == PositionStatus.Open)
-                .Sum(pi => pi.Quantity);
+            var opis = new List<PositionInfo>();
 
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].Symbol == symbol && hExt.PositionInfos[x].PriceChange < 0 && hExt.PositionInfos[x].Status == PositionStatus.Open)
+                {
+                    opis.Add(hExt.PositionInfos[x]);
+                }
+            }
+
+            return opis.Sum(pi => pi.Quantity);
         }
 
         public static int GetOpenLosingPositionCount()
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.PositionInfos.Where(pi => pi.PriceChange < 0 && pi.Status == PositionStatus.Open)
-                .Count();
+            var opis = new List<PositionInfo>();
 
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].PriceChange < 0 && hExt.PositionInfos[x].Status == PositionStatus.Open)
+                {
+                    opis.Add(hExt.PositionInfos[x]);
+                }
+            }
+
+            return opis.Count;
         }
 
         public static List<PositionInfo> GetOpenPositionInfos()
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.PositionInfos.Where(pi => pi.Status == PositionStatus.Open).ToList();
+            var opis = new List<PositionInfo>();
 
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].Status == PositionStatus.Open)
+                {
+                    opis.Add(hExt.PositionInfos[x]);
+                }
+            }
+
+            return opis;
         }
 
         public static List<PositionInfo> GetOpenPositionInfos(int portfolioId, int strategyId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.PositionInfos.Where(pi => pi.Status == PositionStatus.Open && pi.PortfolioId == portfolioId && pi.StrategyId == strategyId).ToList();
+            var opis = new List<PositionInfo>();
+
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].Status == PositionStatus.Open && hExt.PositionInfos[x].PortfolioId == portfolioId && hExt.PositionInfos[x].StrategyId == strategyId)
+                {
+                    opis.Add(hExt.PositionInfos[x]);
+                }
+            }
+
+            return opis;
         }
 
         public static List<PositionInfo> GetOpenPositionInfos(int portfolioId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.PositionInfos.Where(pi => pi.Status == PositionStatus.Open && pi.PortfolioId == portfolioId).ToList();
+            var opis = new List<PositionInfo>();
+
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].Status == PositionStatus.Open && hExt.PositionInfos[x].PortfolioId == portfolioId)
+                {
+                    opis.Add(hExt.PositionInfos[x]);
+                }
+            }
+
+            return opis;
         }
 
         public static List<PositionInfo> GetPositionInfos()
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
             return hExt.PositionInfos;
-
         }
 
 
         public static List<PositionInfo> GetPositionInfosByStatusAndSymbol(PositionStatus status, string symbol)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.PositionInfos.Where(pi => pi.Symbol == symbol && pi.Status == status).ToList();
+            var opis = new List<PositionInfo>();
 
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].Status == status && hExt.PositionInfos[x].Symbol == symbol)
+                {
+                    opis.Add(hExt.PositionInfos[x]);
+                }
+            }
+
+            return opis;
         }
 
         public static List<PositionInfo> GetPositionInfosForPositionStrategyPortfolio(int positionId, int strategyId, int portfolioId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.PositionInfos.Where(pi => pi.PositionId == positionId && pi.StrategyId == strategyId && pi.PortfolioId == portfolioId).ToList();
+            var opis = new List<PositionInfo>();
+
+            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            {
+                if (hExt.PositionInfos[x].PositionId == positionId && hExt.PositionInfos[x].PortfolioId == portfolioId && hExt.PositionInfos[x].StrategyId == strategyId)
+                {
+                    opis.Add(hExt.PositionInfos[x]);
+                }
+            }
+
+            return opis;
         }
 
         private static PositionInfoTrackerManager GetPositionInfoTrackerManagerInstance()
