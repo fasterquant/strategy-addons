@@ -13,7 +13,7 @@ namespace FasterQuant.HedgeExtensionTests
         public void PositionInfoWithBarEndDateTime()
         {
             var currentDate = DateTime.Now;
-            PositionInfoTracker.Initialize();
+            PositionInfoTracker.Initialize(0);
             PositionInfoTracker.AddPositionInfo(1, 33, 34, DateTime.Now, 0, 23, 1, "XYZ", PositionType.Long, 123);
             PositionInfoTracker.AddPositionInfo(1, 38, 39, DateTime.Now, 0, 23, 1, "XYZ", PositionType.Long, 124);
             PositionInfoTracker.AddPositionInfo(2, 22, 27, DateTime.Now, 0, 23, 1, "ABC", PositionType.Long, 123);
@@ -25,7 +25,7 @@ namespace FasterQuant.HedgeExtensionTests
             var barstartDt = 124;
 
             // --------------Start PositionTracker indicator code---------------------
-            var positionInfos = PositionInfoTracker.GetPositionInfos().Where(pi => pi.PortfolioDateTime <= barstartDt).OrderByDescending(pi => pi.PortfolioDateTime);
+            var positionInfos = PositionInfoTracker.GetPositionInfos(0).Where(pi => pi.PortfolioDateTime <= barstartDt).OrderByDescending(pi => pi.PortfolioDateTime);
 
             // Perform sums on this collection
             var currentPositionInfos = new List<PositionInfo>();

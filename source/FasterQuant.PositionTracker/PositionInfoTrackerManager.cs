@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace FasterQuant.PositionTracker
 {
     internal sealed class PositionInfoTrackerManager
     {
 
-        internal List<PositionInfo> PositionInfos;
+        internal Dictionary<int, ConcurrentQueue<PositionInfo>> PositionInfos;
         internal Dictionary <int, int> MaxPositionCount;
         internal Dictionary<int, int> MaxPositionCountPerSymbol;
 
@@ -15,7 +16,9 @@ namespace FasterQuant.PositionTracker
 
         private PositionInfoTrackerManager()
         {
-            this.PositionInfos = new List<PositionInfo>();
+            this.PositionInfos = new Dictionary<int, ConcurrentQueue<PositionInfo>>();
+            this.MaxPositionCount = new Dictionary<int, int>();
+            this.MaxPositionCountPerSymbol = new Dictionary<int, int>();
         }
 
         public static PositionInfoTrackerManager Instance

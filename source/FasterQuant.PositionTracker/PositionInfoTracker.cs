@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,30 +8,16 @@ namespace FasterQuant.PositionTracker
 {
     public class PositionInfoTracker
     {
-        public static void Initialize()
-        {
-            var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
-            positionTrackerManager.PositionInfos = new List<PositionInfo>();
-            positionTrackerManager.MaxPositionCount = new Dictionary<int, int>();
-            positionTrackerManager.MaxPositionCountPerSymbol = new Dictionary<int, int>();
-        }
-
         public static void Initialize(int portfolioId)
         {
             var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
-            positionTrackerManager.PositionInfos = positionTrackerManager.PositionInfos == null
-                                                    ? new List<PositionInfo>()
-                                                    : positionTrackerManager.PositionInfos.Where(pi => pi.PortfolioId != portfolioId).ToList();
-            positionTrackerManager.MaxPositionCount = new Dictionary<int, int>();
-            positionTrackerManager.MaxPositionCountPerSymbol = new Dictionary<int, int>();
+            positionTrackerManager.PositionInfos[portfolioId] = new ConcurrentQueue<PositionInfo>();
         }
 
         public static void Initialize(int portfolioId, int maxPositionCount, int maxPositionCountPerSymbol)
         {
             var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
-            positionTrackerManager.PositionInfos = new List<PositionInfo>();
-            positionTrackerManager.MaxPositionCount = new Dictionary<int, int>();
-            positionTrackerManager.MaxPositionCountPerSymbol = new Dictionary<int, int>();
+            positionTrackerManager.PositionInfos[portfolioId] = new ConcurrentQueue<PositionInfo>();
             positionTrackerManager.MaxPositionCount[portfolioId] = maxPositionCount;
             positionTrackerManager.MaxPositionCountPerSymbol[portfolioId] = maxPositionCountPerSymbol;
         }
@@ -39,28 +26,28 @@ namespace FasterQuant.PositionTracker
             string symbol, PositionType type)
         {
             var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
-            positionTrackerManager.PositionInfos.Add(new PositionInfo(positionId, averageEntryPrice, currentPrice, entryDateTime, portfolioId, quantity, strategyId, symbol, type));
+            positionTrackerManager.PositionInfos[portfolioId].Enqueue(new PositionInfo(positionId, averageEntryPrice, currentPrice, entryDateTime, portfolioId, quantity, strategyId, symbol, type));
         }
 
         public static void AddPositionInfo(int positionId, double averageEntryPrice, double currentPrice, DateTime entryDateTime, int portfolioId, double quantity, int strategyId,
             string symbol, PositionType type, long portfolioDateTime)
         {
             var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
-            positionTrackerManager.PositionInfos.Add(new PositionInfo(positionId, averageEntryPrice, currentPrice, entryDateTime, portfolioId, quantity, strategyId, symbol, type, portfolioDateTime));
+            positionTrackerManager.PositionInfos[portfolioId].Enqueue(new PositionInfo(positionId, averageEntryPrice, currentPrice, entryDateTime, portfolioId, quantity, strategyId, symbol, type, portfolioDateTime));
         }
 
         public static void AddPositionInfo(int positionId, double averageEntryPrice, double currentPrice, DateTime entryDateTime, DateTime exitDateTime, double priceChange, double profitLoss, int portfolioId, double quantity, int strategyId,
            string symbol, PositionType type, long portfolioDateTime)
         {
             var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
-            positionTrackerManager.PositionInfos.Add(new PositionInfo(positionId, averageEntryPrice, currentPrice, entryDateTime, exitDateTime, priceChange, profitLoss,  portfolioId, quantity, strategyId, symbol, type, portfolioDateTime));
+            positionTrackerManager.PositionInfos[portfolioId].Enqueue(new PositionInfo(positionId, averageEntryPrice, currentPrice, entryDateTime, exitDateTime, priceChange, profitLoss,  portfolioId, quantity, strategyId, symbol, type, portfolioDateTime));
         }
 
         public static void AddPositionInfo(int positionId, double averageEntryPrice, double currentPrice, DateTime entryDateTime, double priceChange, double profitLoss, int portfolioId, double quantity, int strategyId,
            string symbol, PositionType type, long portfolioDateTime)
         {
             var positionTrackerManager = GetPositionInfoTrackerManagerInstance();
-            positionTrackerManager.PositionInfos.Add(new PositionInfo(positionId, averageEntryPrice, currentPrice, entryDateTime, priceChange, profitLoss, portfolioId, quantity, strategyId, symbol, type, portfolioDateTime));
+            positionTrackerManager.PositionInfos[portfolioId].Enqueue(new PositionInfo(positionId, averageEntryPrice, currentPrice, entryDateTime, priceChange, profitLoss, portfolioId, quantity, strategyId, symbol, type, portfolioDateTime));
         }
 
         public static void UpdatePositionInfo(int positionId, double averageEntryPrice, double currentPrice, DateTime exitDateTime, double priceChange, double profitLoss, int portfolioId, double quantity,
@@ -69,11 +56,12 @@ namespace FasterQuant.PositionTracker
             var hExt = GetPositionInfoTrackerManagerInstance();
             
             PositionInfo positionInfo = null;
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].PositionId == positionId && hExt.PositionInfos[x].StrategyId == strategyId && hExt.PositionInfos[x].PortfolioId == portfolioId)
+                if (pi.PositionId == positionId && pi.StrategyId == strategyId && pi.PortfolioId == portfolioId)
                 {
-                    positionInfo = hExt.PositionInfos[x];
+                    positionInfo = pi;
                     break;
                 }
             }
@@ -98,11 +86,12 @@ namespace FasterQuant.PositionTracker
             var hExt = GetPositionInfoTrackerManagerInstance();
            
             PositionInfo positionInfo = null;
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+           
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].PositionId == positionId && hExt.PositionInfos[x].StrategyId == strategyId && hExt.PositionInfos[x].PortfolioId == portfolioId && hExt.PositionInfos[x].PortfolioDateTime == portfolioDateTime)
+                if (pi.PositionId == positionId && pi.StrategyId == strategyId && pi.PortfolioId == portfolioId && pi.PortfolioDateTime == portfolioDateTime)
                 {
-                    positionInfo = hExt.PositionInfos[x];
+                    positionInfo = pi;
                     break;
                 }
             }
@@ -126,11 +115,12 @@ namespace FasterQuant.PositionTracker
             var hExt = GetPositionInfoTrackerManagerInstance();
           
             PositionInfo positionInfo = null;
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+           
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].StrategyId == strategyId && hExt.PositionInfos[x].PortfolioId == portfolioId && hExt.PositionInfos[x].Symbol == symbol && hExt.PositionInfos[x].Type == type && hExt.PositionInfos[x].Status == status)
+                if (pi.StrategyId == strategyId && pi.PortfolioId == portfolioId && pi.Symbol == symbol && pi.Type == type && pi.Status == status)
                 {
-                    positionInfo = hExt.PositionInfos[x];
+                    positionInfo = pi;
                     break;
                 }
             }
@@ -142,7 +132,7 @@ namespace FasterQuant.PositionTracker
                 return;
             }
 
-            hExt.PositionInfos.Add(new PositionInfo(positionId, portfolioId, strategyId, symbol, type, status));
+            hExt.PositionInfos[portfolioId].Enqueue(new PositionInfo(positionId, portfolioId, strategyId, symbol, type, status));
         }
 
         public static void SetPositionInfoToClosed(PositionInfo positionInfo)
@@ -162,48 +152,48 @@ namespace FasterQuant.PositionTracker
             return hExt.MaxPositionCountPerSymbol.ContainsKey(portfolioId) ? hExt.MaxPositionCountPerSymbol[portfolioId] : 0;
         }
 
-        public static double GetSymbolQuantityInOpenLosingPositions(string symbol)
+        public static double GetSymbolQuantityInOpenLosingPositions(string symbol, int portfolioId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
             var opis = new List<PositionInfo>();
-
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].Symbol == symbol && hExt.PositionInfos[x].PriceChange < 0 && hExt.PositionInfos[x].Status == PositionStatus.Open)
+                if (pi.Symbol == symbol && pi.PriceChange < 0 && pi.Status == PositionStatus.Open)
                 {
-                    opis.Add(hExt.PositionInfos[x]);
+                    opis.Add(pi);
                 }
             }
 
             return opis.Sum(pi => pi.Quantity);
         }
 
-        public static int GetOpenLosingPositionCount()
+        public static int GetOpenLosingPositionCount(int portfolioId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
             var opis = new List<PositionInfo>();
 
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].PriceChange < 0 && hExt.PositionInfos[x].Status == PositionStatus.Open)
+                if (pi.PriceChange < 0 && pi.Status == PositionStatus.Open)
                 {
-                    opis.Add(hExt.PositionInfos[x]);
+                    opis.Add(pi);
                 }
             }
 
             return opis.Count;
         }
 
-        public static List<PositionInfo> GetOpenPositionInfos()
+        public static List<PositionInfo> GetOpenPositionInfos(int portfolioId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
             var opis = new List<PositionInfo>();
 
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].Status == PositionStatus.Open)
+                if (pi.Status == PositionStatus.Open)
                 {
-                    opis.Add(hExt.PositionInfos[x]);
+                    opis.Add(pi);
                 }
             }
 
@@ -215,50 +205,35 @@ namespace FasterQuant.PositionTracker
             var hExt = GetPositionInfoTrackerManagerInstance();
             var opis = new List<PositionInfo>();
 
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].Status == PositionStatus.Open && hExt.PositionInfos[x].PortfolioId == portfolioId && hExt.PositionInfos[x].StrategyId == strategyId)
+                if (pi.Status == PositionStatus.Open && pi.PortfolioId == portfolioId && pi.StrategyId == strategyId)
                 {
-                    opis.Add(hExt.PositionInfos[x]);
+                    opis.Add(pi);
                 }
             }
 
             return opis;
         }
 
-        public static List<PositionInfo> GetOpenPositionInfos(int portfolioId)
+        public static List<PositionInfo> GetPositionInfos(int portfolioId)
+        {
+            var hExt = GetPositionInfoTrackerManagerInstance();
+
+            return hExt.PositionInfos[portfolioId].ToList<PositionInfo>();
+        }
+
+
+        public static List<PositionInfo> GetPositionInfosByStatusAndSymbol(PositionStatus status, string symbol, int portfolioId)
         {
             var hExt = GetPositionInfoTrackerManagerInstance();
             var opis = new List<PositionInfo>();
 
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].Status == PositionStatus.Open && hExt.PositionInfos[x].PortfolioId == portfolioId)
+                if (pi.Status == status && pi.Symbol == symbol)
                 {
-                    opis.Add(hExt.PositionInfos[x]);
-                }
-            }
-
-            return opis;
-        }
-
-        public static List<PositionInfo> GetPositionInfos()
-        {
-            var hExt = GetPositionInfoTrackerManagerInstance();
-            return hExt.PositionInfos;
-        }
-
-
-        public static List<PositionInfo> GetPositionInfosByStatusAndSymbol(PositionStatus status, string symbol)
-        {
-            var hExt = GetPositionInfoTrackerManagerInstance();
-            var opis = new List<PositionInfo>();
-
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
-            {
-                if (hExt.PositionInfos[x].Status == status && hExt.PositionInfos[x].Symbol == symbol)
-                {
-                    opis.Add(hExt.PositionInfos[x]);
+                    opis.Add(pi);
                 }
             }
 
@@ -270,11 +245,11 @@ namespace FasterQuant.PositionTracker
             var hExt = GetPositionInfoTrackerManagerInstance();
             var opis = new List<PositionInfo>();
 
-            for (int x = 0; x < hExt.PositionInfos.Count; x++)
+            foreach (var pi in hExt.PositionInfos[portfolioId])
             {
-                if (hExt.PositionInfos[x].PositionId == positionId && hExt.PositionInfos[x].PortfolioId == portfolioId && hExt.PositionInfos[x].StrategyId == strategyId)
+                if (pi.PositionId == positionId && pi.PortfolioId == portfolioId && pi.StrategyId == strategyId)
                 {
-                    opis.Add(hExt.PositionInfos[x]);
+                    opis.Add(pi);
                 }
             }
 
